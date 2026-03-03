@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#d63384">
+<title>Bloom & Bliss</title>
+
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:linear-gradient(to bottom right,#fff0f6,#ffe3ec);
+  color:#333;
+}
+
+header{
+  background:white;
+  padding:1rem 2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+header h1{
+  font-family:'Playfair Display',serif;
+  color:#d63384;
+}
+
+nav{
+  display:flex;
+  align-items:center;
+}
+
+nav a{
+  margin-left:1.5rem;
+  text-decoration:none;
+  color:#555;
+  font-weight:500;
+}
+
+.btn{
+  padding:0.6rem 1.5rem;
+  background:#d63384;
+  color:white;
+  border:none;
+  border-radius:50px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn:hover{
+  background:#b0256b;
+  transform:translateY(-2px);
+}
+
+.hero{
+  padding:4rem 2rem;
+  text-align:center;
+}
+
+.hero h2{
+  font-family:'Playfair Display',serif;
+  font-size:2.3rem;
+  margin-bottom:1rem;
+  color:#b03060;
+}
+
+.products{
+  padding:3rem 2rem;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:2rem;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-8px);
+}
+
+.card img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+}
+
+.card-content{
+  padding:1rem;
+}
+
+.price{
+  color:#d63384;
+  font-weight:bold;
+  margin:0.5rem 0 1rem 0;
+}
+
+/* CART PANEL */
+#cart-panel{
+  position:fixed;
+  top:0;
+  right:-400px;
+  width:350px;
+  height:100%;
+  background:white;
+  box-shadow:-4px 0 20px rgba(0,0,0,0.1);
+  padding:20px;
+  transition:0.4s;
+  z-index:999;
+  overflow-y:auto;
+}
+
+#cart-panel.active{
+  right:0;
+}
+
+.cart-item{
+  margin-bottom:15px;
+  border-bottom:1px solid #eee;
+  padding-bottom:10px;
+}
+
+.qty-btn{
+  padding:2px 8px;
+  margin:0 5px;
+  border:none;
+  background:#ffe3ec;
+  cursor:pointer;
+  border-radius:4px;
+}
+
+#toast{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#d63384;
+  color:white;
+  padding:10px 20px;
+  border-radius:50px;
+  opacity:0;
+  transition:0.4s;
+}
+
+#toast.show{
+  opacity:1;
+}
+
+footer{
+  text-align:center;
+  padding:2rem;
+  background:white;
+  margin-top:2rem;
+  font-size:0.9rem;
+  color:#777;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Bloom & Bliss</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Shop</a>
+    <button class="btn" id="cart-btn">
+      🛒 (<span id="cart-count">0</span>)
+    </button>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Fresh Flowers. Delivered with Love.</h2>
+  <p>Handcrafted bouquets for every occasion.</p>
+</section>
+
+<section class="products">
+
+<div class="card">
+  <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946" alt="">
+  <div class="card-content">
+    <h3>Romantic Roses</h3>
+    <div class="price">₹999</div>
+    <button class="btn" onclick="addToCart('Romantic Roses',999)">Add to Cart</button>
+  </div>
+</div>
+
+<div class="card">
+  <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93" alt="">
+  <div class="card-content">
+    <h3>Elegant Tulips</h3>
+    <div class="price">₹1299</div>
+    <button class="btn" onclick="addToCart('Elegant Tulips',1299)">Add to Cart</button>
+  </div>
+</div>
+
+<div class="card">
+  <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b" alt="">
+  <div class="card-content">
+    <h3>Spring Mix</h3>
+    <div class="price">₹1499</div>
+    <button class="btn" onclick="addToCart('Spring Mix',1499)">Add to Cart</button>
+  </div>
+</div>
+
+</section>
+
+<!-- CART PANEL -->
+<div id="cart-panel">
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <h3 id="cart-total">Total: ₹0</h3>
+  <button class="btn" onclick="clearCart()">Clear Cart</button>
+  <button class="btn" onclick="toggleCart()" style="margin-top:10px;">Close</button>
+</div>
+
+<div id="toast">Added to Cart</div>
+
+<footer>
+© 2026 Bloom & Bliss | Crafted with 🌸
+</footer>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function toggleCart(){
+  document.getElementById("cart-panel").classList.toggle("active");
+}
+
+document.getElementById("cart-btn").addEventListener("click",toggleCart);
+
+function saveCart(){
+  localStorage.setItem("cart",JSON.stringify(cart));
+}
+
+function updateCart(){
+  const cartItems=document.getElementById("cart-items");
+  const cartCount=document.getElementById("cart-count");
+  const cartTotal=document.getElementById("cart-total");
+
+  cartItems.innerHTML="";
+  let total=0;
+  let count=0;
+
+  cart.forEach((item,index)=>{
+    total+=item.price*item.quantity;
+    count+=item.quantity;
+
+    cartItems.innerHTML+=`
+      <div class="cart-item">
+        <strong>${item.name}</strong><br>
+        ₹${item.price}
+        <div>
+          <button class="qty-btn" onclick="changeQty(${index},-1)">-</button>
+          ${item.quantity}
+          <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
+        </div>
+        <button onclick="removeItem(${index})" style="margin-top:5px;">Remove</button>
+      </div>
+    `;
+  });
+
+  cartTotal.innerText="Total: ₹"+total;
+  cartCount.innerText=count;
+  saveCart();
+}
+
+function addToCart(name,price){
+  const existing=cart.find(item=>item.name===name);
+  if(existing){
+    existing.quantity++;
+  }else{
+    cart.push({name,price,quantity:1});
+  }
+  showToast();
+  updateCart();
+}
+
+function changeQty(index,delta){
+  cart[index].quantity+=delta;
+  if(cart[index].quantity<=0){
+    cart.splice(index,1);
+  }
+  updateCart();
+}
+
+function removeItem(index){
+  cart.splice(index,1);
+  updateCart();
+}
+
+function clearCart(){
+  cart=[];
+  updateCart();
+}
+
+function showToast(){
+  const toast=document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1500);
+}
+
+updateCart();
+
+// Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
+</body>
+</html>
